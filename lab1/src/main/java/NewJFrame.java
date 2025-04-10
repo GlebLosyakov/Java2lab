@@ -21,7 +21,7 @@ import java.util.Vector;
  * @author 79374
  */
 public class NewJFrame extends javax.swing.JFrame {
-
+    LinkedList<String> earlBio = new LinkedList<>();
     /**
      * Creates new form NewJFrame
      */
@@ -117,7 +117,12 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("jButton5");
+        jButton5.setText("Очистить");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -238,21 +243,34 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        String lowerBound = earlBio.getFirst();
-        earlBio.removeFirst();
-        String upperBound = earlBio.getFirst();
-        earlBio.removeFirst();
-        String step = earlBio.getFirst();
-        earlBio.removeFirst();
-        if (!lowerBound.isEmpty() && !upperBound.isEmpty() && !step.isEmpty()) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+       if (earlBio.size() >= 3) { // Проверяем, есть ли достаточно данных
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        
+        // Добавляем данные в таблицу
+        for (int i = 0; i < earlBio.size(); i += 3) {
+            String lowerBound = earlBio.get(i);
+            String upperBound = earlBio.get(i + 1);
+            String step = earlBio.get(i + 2);
             model.addRow(new Object[]{lowerBound, upperBound, step, ""});
-            jTextField1.setText("");
-            jTextField2.setText("");
-            jTextField3.setText("");
-            }
+        }
+
+        // Очищаем earlBio после добавления в таблицу, если это необходимо
+        earlBio.clear();
+    } else {
+        JOptionPane.showMessageDialog(this, "Недостаточно данных для добавления в таблицу.");
+    }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        deleteRows();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void deleteRows(){
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    
+        model.setRowCount(0);
+    }
+    private RecIntegral currentRecIntegral;
     private void addRow(){
         String lowerBound = jTextField1.getText();
         String upperBound = jTextField2.getText();
@@ -263,7 +281,9 @@ public class NewJFrame extends javax.swing.JFrame {
             jTextField1.setText("");
             jTextField2.setText("");
             jTextField3.setText("");
-            RecIntegral(lowerBound, upperBound, step);
+             currentRecIntegral = new RecIntegral(lowerBound, upperBound, step);
+            earlBio.addAll(currentRecIntegral.getEarlBio()); // Добавляем данные в earlBio
+            //RecIntegral(lowerBound, upperBound, step);
         } else {
             JOptionPane.showMessageDialog(this, "Пожалуйста, заполните все поля.");
         }
@@ -310,14 +330,53 @@ public class NewJFrame extends javax.swing.JFrame {
     private double func(double x){
         return Math.pow(x, 2);
     }
-    LinkedList<String> earlBio = new LinkedList<>();
-    private void RecIntegral(String lowerBound, String upperBound, String step){
+    
+    /*private void RecIntegral(String lowerBound, String upperBound, String step){
         //LinkedList<String> earlBio = new LinkedList<>();
         earlBio.add(lowerBound);
         earlBio.add(upperBound);
         earlBio.add(step);
         
+    }*/
+    
+    
+public class RecIntegral {
+    private String lowerBound;
+    private String upperBound;
+    private String step;
+    private LinkedList<String> earlBio;
+
+    // Конструктор
+    public RecIntegral(String lowerBound, String upperBound, String step) {
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+        this.step = step;
+        this.earlBio = new LinkedList<>();
+        
+        // Добавляем значения в список
+        earlBio.add(lowerBound);
+        earlBio.add(upperBound);
+        earlBio.add(step);
     }
+    
+    // Геттеры
+    public String getLowerBound() {
+        return lowerBound;
+    }
+
+    public String getUpperBound() {
+        return upperBound;
+    }
+
+    public String getStep() {
+        return step;
+    }
+
+    public LinkedList<String> getEarlBio() {
+        return earlBio;
+    }
+}
+
     
     /**
      * @param args the command line arguments
